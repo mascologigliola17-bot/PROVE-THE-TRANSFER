@@ -1,0 +1,681 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Prove the Transfer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap">
+<style>
+/* Layout: sticky top bar (logo, Upload CV) with the process navigation underneath; main journey column left, "How your profile is read" panel right. */
+:root{
+  --bg:#EDF0F4; --surface:#FFFFFF; --surface2:#F5F7FA; --ink:#111B2E; --muted:#58657A; --line:#D6DCE5;
+  --accent:#1D4F9F; --accent-ink:#FFFFFF; --accent-soft:#E3ECFA;
+  --ok:#0B7A68; --ok-soft:#DDF1EC; --part:#9A5B00; --part-soft:#FBEBD0; --none:#AE3329; --none-soft:#F9E1DE;
+  --f-sans:"Open Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Open Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B1120; --surface:#131C30; --surface2:#182339; --ink:#E6EBF4; --muted:#94A1B8; --line:#26334D;
+  --accent:#6FA2F2; --accent-ink:#0B1120; --accent-soft:#1B2C4A;
+  --ok:#4CC2A9; --ok-soft:#12332E; --part:#E6A54A; --part-soft:#392A10; --none:#F08A80; --none-soft:#3B1B19; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1120; --surface:#131C30; --surface2:#182339; --ink:#E6EBF4; --muted:#94A1B8; --line:#26334D;
+  --accent:#6FA2F2; --accent-ink:#0B1120; --accent-soft:#1B2C4A;
+  --ok:#4CC2A9; --ok-soft:#12332E; --part:#E6A54A; --part-soft:#392A10; --none:#F08A80; --none-soft:#3B1B19; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f-sans);padding-inline:0;padding-block:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar .wrap.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px}
+.logo{display:flex;align-items:center;gap:10px;border:0;background:none;padding:0;text-align:left;min-width:0}
+.logo svg{flex:none;color:var(--accent)}
+.logo b{font:600 14px var(--f-sans);letter-spacing:.08em;text-transform:uppercase;line-height:1.1;white-space:nowrap}
+.logo small{display:block;font:400 11px var(--f-sans);letter-spacing:0;text-transform:none;color:var(--muted);margin-top:2px}
+.btn{border:1px solid var(--line);background:var(--surface);padding:9px 16px;border-radius:6px;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.lg{padding:13px 24px;font-size:16px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn[aria-pressed="true"]{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.proc{display:flex;gap:2px;overflow-x:auto;padding-block:8px;border-top:1px solid var(--line)}
+.proc button{border:0;background:none;padding:6px 14px;border-radius:99px;color:var(--muted);white-space:nowrap;font-size:13.5px;display:flex;gap:8px;align-items:center}
+.proc button:not([disabled]):hover{background:var(--surface2);color:var(--ink)}
+.proc button[disabled]{opacity:.5;cursor:default}
+.proc button.done{color:var(--ink)}
+.proc button.done::before{content:"\2713";color:var(--ok);font-size:12px}
+.proc button[aria-current="step"]{background:var(--ink);color:var(--bg)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:24px;padding-block:28px 56px;align-items:start}
+main{min-width:0;display:flex;flex-direction:column;gap:20px}
+aside{position:sticky;top:130px;display:flex;flex-direction:column;gap:14px}
+.read{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:2px}
+.read .kicker{margin-bottom:8px}
+.ri{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:10px 8px;border-radius:8px;border:1px solid transparent}
+.ri i{font:600 12px var(--f-mono);font-style:normal;color:var(--muted);padding-top:2px}
+.ri b{display:block;font-size:14px}
+.ri span{font-size:12.5px;color:var(--muted);line-height:1.4}
+.ri.on{background:var(--accent-soft);border-color:var(--accent)}
+.ri.on i{color:var(--accent)}
+.ri.na b{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.ri.na span{font-style:italic}
+.gov{font-size:12.5px;color:var(--muted);padding:12px 14px;border:1px dashed var(--line);border-radius:8px}
+.gov b{color:var(--ink);font-weight:600}
+.kicker{font:600 12px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:32px;line-height:1.15;font-weight:600;margin:6px 0 0;text-wrap:balance}
+h2{font-size:21px;line-height:1.25;font-weight:600;margin:4px 0 0;text-wrap:balance}
+h2.caps{font-size:19px;letter-spacing:.02em;text-transform:uppercase}
+h3{font-size:15px;margin:0;font-weight:600}
+.lead{color:var(--muted);max-width:66ch;margin:8px 0 0}
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 11.5px var(--f-mono);letter-spacing:.04em;padding:3px 9px;border-radius:99px;white-space:nowrap;text-transform:uppercase}
+.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.part{background:var(--part-soft);color:var(--part)} .chip.none{background:var(--none-soft);color:var(--none)} .chip.info{background:var(--accent-soft);color:var(--accent)} .chip.plain{background:var(--surface2);color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px;display:flex;flex-direction:column;gap:18px}
+.card{border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card.tint{background:var(--surface2)}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px}
+.callout{padding:13px 15px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;font-size:14px}
+.callout.warn{border-color:var(--none);background:var(--none-soft)}
+.callout.sep{border-color:var(--part);background:var(--part-soft)}
+.callout b{display:block;font:600 12px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+/* home */
+.profile{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:14px 16px;border-radius:10px;background:var(--surface2)}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:600 15px var(--f-mono)}
+.profile b{font-size:17px;display:block}.profile span{font-size:13.5px;color:var(--muted)}
+.others{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:13px;color:var(--muted)}
+.others button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:5px 12px;font-size:13px}
+.others button:hover{border-color:var(--accent)}
+.file{display:inline-flex;gap:8px;align-items:center;font:600 12.5px var(--f-mono);color:var(--muted)}
+.upl{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.upl .ok{font:600 14px var(--f-mono);color:var(--ok);letter-spacing:.06em}
+/* analysis */
+.status{font:600 13px var(--f-mono);letter-spacing:.12em;color:var(--accent);min-height:20px}
+.acols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.acols .card{min-height:330px}
+.exps{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.exps li{padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);animation:rise .4s ease-out}
+.exps li small{display:block;margin-top:2px;font-size:12.5px;color:var(--ok);animation:rise .4s ease-out}
+.lib{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.lib li{padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;color:var(--muted);opacity:.5;transition:transform .25s,opacity .25s,background .25s,border-color .25s,color .25s;display:flex;justify-content:space-between;gap:8px}
+.lib li.scan{opacity:1;transform:translateX(6px);border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+.lib li.hit{opacity:1;color:var(--ink);border-color:var(--ok);background:var(--ok-soft)}
+.lib li.hit::after{content:"\2713";color:var(--ok);font-weight:600}
+.note{font-size:13px;color:var(--muted)}
+.note a{color:var(--accent);font-weight:600}
+.done-msg{padding:14px 16px;border-radius:8px;background:var(--ok-soft);border:1px solid var(--ok);animation:rise .4s ease-out}
+.done-msg b{font:600 13px var(--f-mono);letter-spacing:.1em;display:block;color:var(--ok)}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* work pattern */
+.pname{padding:12px 14px;border-radius:8px;background:var(--ink);color:var(--bg);font-weight:600}
+.dimgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.dimgrid>div{padding:14px 16px;border-right:1px solid var(--line);border-top:1px solid var(--line)}
+.dimgrid>div:nth-child(3n){border-right:0}
+.dimgrid>div:nth-child(-n+3){border-top:0}
+.dimgrid label,.dims label{display:block;font:600 11.5px var(--f-mono);letter-spacing:.1em;color:var(--accent);margin-bottom:3px}
+.dims{display:flex;flex-direction:column}
+.dims div{padding:8px 0;border-top:1px solid var(--line);font-size:13.5px}.dims div:first-child{border-top:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.act{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:var(--surface2);border-radius:99px;padding:6px 8px 6px 14px;font-size:13.5px}
+.act button{border:0;background:none;color:var(--muted);width:22px;height:22px;border-radius:50%;line-height:1}
+.act button:hover{background:var(--line)}
+.act.off{opacity:.45;text-decoration:line-through}
+.map{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px;align-items:start}
+.mapbox{border:1px solid var(--line);border-radius:10px;background:var(--surface2);padding:8px;min-width:0}
+svg.cl{width:100%;height:auto;display:block}
+.cl text{font-family:var(--f-sans);fill:var(--muted)}
+.cl .node circle.base{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+.cl .node circle.tint{fill:transparent}
+.cl .node.sec circle.base{stroke:var(--accent);stroke-dasharray:5 4;stroke-width:1.8}
+.cl .node.sec circle.tint{fill:var(--accent-soft);opacity:.45}
+.cl .node.main circle.base{stroke:var(--accent);stroke-width:3}
+.cl .node.main circle.tint{fill:var(--accent-soft)}
+.cl .node.main text,.cl .node.sec text{fill:var(--ink)}
+.cl .node.main text{font-weight:600}
+.cl .edge{stroke:var(--accent);stroke-width:2.2;fill:none}
+.cl .edge.dash{stroke-dasharray:6 5;stroke-width:1.6}
+.cl .edge.bad{stroke:var(--none);stroke-dasharray:6 5;stroke-width:1.8}
+.cl .cv rect{fill:var(--ink)} .cl .cv text{fill:var(--bg);font-weight:600;font-family:var(--f-mono)}
+.cl .flag rect{fill:var(--surface);stroke:var(--line);stroke-width:1.2}
+.cl .flag text{font-family:var(--f-mono);font-size:11.5px;fill:var(--ink)}
+.cl .flag.hit rect{fill:var(--ok);stroke:var(--ok)} .cl .flag.hit text{fill:var(--surface);font-weight:600}
+.cl .flag.bad rect{fill:var(--none-soft);stroke:var(--none)} .cl .flag.bad text{fill:var(--none)}
+.cl .x{fill:var(--none);font:600 16px var(--f-mono)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted);padding:8px 10px 4px}
+.legend i{display:inline-block;width:22px;height:0;border-top:2px solid var(--accent);vertical-align:middle;margin-right:6px}
+.legend i.d{border-top-style:dashed}
+/* vacancy + evidence */
+.vac{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:16px;border:1px solid var(--line);border-radius:10px}
+.vac b.code{font:600 18px var(--f-mono)}
+.vac .t{flex:1 1 260px;min-width:0}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table.ev{width:100%;border-collapse:collapse;font-size:13px;min-width:700px;table-layout:fixed}
+table.ev th{white-space:normal;overflow-wrap:anywhere;font:600 10.5px var(--f-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--accent);text-align:left;padding:10px 12px;background:var(--surface2);}
+table.ev td{padding:12px;border-top:1px solid var(--line);vertical-align:top}
+table.ev td.m{color:var(--part)}
+.req{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px}
+.req:first-of-type{border-top:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.gaplist{margin:0;padding-left:18px}
+.flow3{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font:600 12px var(--f-mono);letter-spacing:.06em}
+.flow3 span{padding:6px 12px;border-radius:99px;background:var(--surface2);border:1px solid var(--line)}
+.flow3 span.last{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.flow3 em{font-style:normal;color:var(--muted)}
+.courses{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.course{border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.course .gapt{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--part)}
+.course b{font-size:16px;line-height:1.3}
+.course .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
+.module{border:1px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.module .q{font-size:18px;font-weight:600;line-height:1.3}
+/* live project */
+.sched{display:flex;flex-direction:column;gap:6px;padding:20px;border-radius:10px;background:var(--surface2);border:1px solid var(--line)}
+.sched .big{font:600 24px var(--f-mono);letter-spacing:.04em}
+.tl{display:flex;flex-direction:column;border-left:2px solid var(--line);margin-left:6px}
+.tl div{padding:6px 0 6px 16px;position:relative}
+.tl div::before{content:"";position:absolute;left:-6px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.tl b{font:600 13px var(--f-mono);color:var(--accent);margin-right:8px}
+.chain5{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+.chain5 span{padding:4px 10px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.chain5 span.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chain5 em{font-style:normal;color:var(--muted)}
+.dec{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.dec button{padding:16px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font:600 14px var(--f-mono);letter-spacing:.12em}
+.dec button:hover{border-color:var(--accent);background:var(--accent-soft)}
+.logrow{display:flex;flex-direction:column;gap:8px;animation:rise .4s ease-out}
+.logrow .d{padding:12px 14px;border-radius:8px;background:var(--surface2);border:1px solid var(--line)}
+.logrow .d b,.newinfo b{display:block;font:600 11.5px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.logrow .d.c{border-left:3px solid var(--part)}
+.newinfo{padding:12px 14px;border:1px solid var(--part);background:var(--part-soft);border-radius:8px}
+.newinfo b{color:var(--part)}
+textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:9px 11px;width:100%;min-height:92px;resize:vertical}
+.pending{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:14px 16px;border:1px dashed var(--part);border-radius:10px;background:var(--part-soft)}
+.pending b{font:600 14px var(--f-mono);letter-spacing:.12em}
+.verdict{display:flex;flex-direction:column;gap:6px;padding:18px 20px;border-radius:10px;border:1px solid var(--line)}
+.verdict.none{background:var(--none-soft);border-color:var(--none)}
+.verdict h2{font-size:24px;margin:0}
+.strip{background:var(--ink);color:var(--bg);font:600 11.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;text-align:center;padding:6px 16px}
+.chat{display:flex;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto;padding:4px 2px}
+.msg{max-width:82%;padding:10px 14px;border-radius:14px;font-size:14.5px}
+.msg.new{animation:rise .3s ease-out}
+.msg.bot{background:var(--surface2);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.me{background:var(--accent);color:var(--accent-ink);align-self:flex-end;border-bottom-right-radius:4px}
+.chatin{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chatin input{flex:1 1 220px;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px;min-width:0}
+/* institutional navy treatment */
+:root{--hdr:#0A2A5E;--hdr-ink:#FFFFFF;--hdr-mute:rgba(255,255,255,.72);--hdr-line:rgba(255,255,255,.2)}
+.bar{background:var(--hdr);color:var(--hdr-ink);border-bottom:0}
+.bar .logo svg{color:var(--hdr-ink)}
+.bar .logo small{color:var(--hdr-mute)}
+.bar .btn.primary{background:var(--hdr-ink);border-color:var(--hdr-ink);color:var(--hdr)}
+.proc{border-top:1px solid var(--hdr-line)}
+.proc button{color:var(--hdr-mute)}
+.proc button:not([disabled]):hover{background:rgba(255,255,255,.12);color:var(--hdr-ink)}
+.proc button.done{color:var(--hdr-ink)}
+.proc button.done::before{color:#8FE0CC}
+.proc button[aria-current="step"]{background:var(--hdr-ink);color:var(--hdr)}
+.strip{background:#061A3D;color:#DCE6F7}
+.proc button[disabled]{opacity:1;color:rgba(255,255,255,.55)}
+h1,h2{letter-spacing:-.005em}
+.panel,.read,.card{box-shadow:0 1px 0 rgba(10,42,94,.06)}
+.samples{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.sample{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.sample:hover{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.sample .doc{display:flex;gap:8px;align-items:center;font:600 12px var(--f-sans);color:var(--muted)}
+.sample b{font-size:16px}.sample span:last-child{font-size:13px;color:var(--accent)}
+@media (max-width:700px){.samples{grid-template-columns:minmax(0,1fr)}}
+textarea#lptxt{width:100%;min-height:150px}
+.fzq{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
+.fzq b{font-weight:600;font-size:14.5px}
+.fz{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.fz button{padding:9px 4px;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;cursor:pointer}
+.fz button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.sit{border-left:3px solid var(--accent);padding:2px 0 2px 14px;font-size:14.5px}
+@media (max-width:640px){.fz{grid-template-columns:1fr 1fr}}
+.anc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr) minmax(0,1.5fr);gap:14px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;align-items:start}
+.anc .al{display:block;font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+@media (max-width:640px){.anc{grid-template-columns:1fr;gap:6px}}
+@media (max-width:980px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  aside{position:static}
+}
+@media (max-width:700px){
+  .acols,.map,.two,.courses,.dec{grid-template-columns:minmax(0,1fr)}
+  .acols .card{min-height:0}
+  .dimgrid{grid-template-columns:minmax(0,1fr)}
+  .dimgrid>div{border-right:0;border-top:1px solid var(--line)!important}.dimgrid>div:first-child{border-top:0!important}
+  .panel{padding:16px}
+  .logo small{display:none}
+  h1{font-size:26px}
+}
+@media (prefers-reduced-motion:reduce){.exps li,.exps li small,.logrow,.done-msg{animation:none}.lib li{transition:none}}
+</style>
+
+<div class="strip">Conceptual prototype for the NSPA challenge · not an official NSPA service</div>
+<header class="bar">
+  <div class="wrap top">
+    <button class="logo" id="home" type="button" aria-label="Prove the Transfer, home">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true"><rect x="1" y="1" width="32" height="32" rx="8" stroke="currentColor" stroke-width="2"/><g fill="currentColor"><path d="M17 5.5L19.3 14.7 17 17 14.7 14.7Z"/><g opacity=".6"><path d="M17 5.5L19.3 14.7 17 17 14.7 14.7Z" transform="rotate(90 17 17)"/><path d="M17 5.5L19.3 14.7 17 17 14.7 14.7Z" transform="rotate(180 17 17)"/><path d="M17 5.5L19.3 14.7 17 17 14.7 14.7Z" transform="rotate(270 17 17)"/></g><g opacity=".35"><path d="M17 9.5L18.5 15.5 17 17 15.5 15.5Z" transform="rotate(45 17 17)"/><path d="M17 9.5L18.5 15.5 17 17 15.5 15.5Z" transform="rotate(135 17 17)"/><path d="M17 9.5L18.5 15.5 17 17 15.5 15.5Z" transform="rotate(225 17 17)"/><path d="M17 9.5L18.5 15.5 17 17 15.5 15.5Z" transform="rotate(315 17 17)"/></g></g><circle cx="17" cy="17" r="1.6" fill="var(--hdr)" stroke="currentColor" stroke-width="1.2"/></svg>
+      <span><b>Prove the Transfer</b><small>From transferable experience to demonstrated capability</small></span>
+    </button>
+  </div>
+  <div class="wrap"><nav class="proc" id="proc" aria-label="Process"></nav></div>
+</header>
+<div class="wrap layout"><main id="main"></main><aside id="aside"></aside></div>
+
+<script>
+(function(){
+const LIB=['Prioritise and coordinate operational flows under constraints','Coordinate stakeholders and resources','Manage procurement activities','Coordinate technical project support','Manage time-critical operational activities','Support project delivery under constraints','Manage HR processes'];
+const LIB_L=LIB.slice();LIB_L[6]='Resolve user requests through communication and problem solving';
+const PROC=['Translate','Explain','Identify gaps','Learn','Prove','Decide'];
+const READ=[['CV','What I have done'],['Work Pattern','What type of work that represents, when it may transfer and what does not'],['Civilian vacancies and evidence','Why the capability may be relevant'],['Gaps and learning','What is missing and how it can be developed'],['Live Project','How the capability can be demonstrated in a new context'],['Human assessment','What remains for human review']];
+const CL={
+ c1:{x:180,y:170,r:78,t:['Coordinate','operational flows','under constraints']},
+ c2:{x:430,y:110,r:64,t:['Plan and support','project delivery']},
+ c3:{x:640,y:190,r:66,t:['Administer technical','and logistics','contracts']},
+ c4:{x:610,y:360,r:66,t:['Operate and','lead IT services']},
+ c5:{x:210,y:360,r:64,t:['Resolve','user requests']},
+ c6:{x:410,y:270,r:62,t:['Analyse and report','operational data']}};
+const FLAG={c1:[-48,86],c2:[-48,72],c4:[-48,-98]};
+const D={
+marta:{name:'Marta Rossi',ini:'MR',file:'Marta_Rossi_CV.pdf',role:'Logistics coordinator · 8 years in civilian logistics',tone:'ok',lib:LIB,
+ exp:['Logistics coordination','Operational planning','Resource prioritisation','Stakeholder coordination','Time-critical supply flows'],
+ links:[[0,0],[2,0],[3,1],[4,4]],
+ vac:{code:'LW003',full:'NSPA LW003',title:'Chief of Section, Supply Management Support of AWACS Fleet',flag:'c1',status:['Potential match','ok']},
+ vacText:'This potential relationship is based on the Work Pattern identified from your experience and the functional requirements published for the vacancy.',
+ map:{main:'c1',sec:['c3','c6'],hit:'c1',bad:false},
+ wp:{name:LIB[0],dims:{OBJECT:'Interdependent deliveries and resources across locations',ACTION:'Sequence, allocate and re-plan flows',CONSTRAINT:'Limited capacity, deadlines, disruptions',DECISION:'Which flow gets scarce resources first',OUTPUT:'A working plan and status updates',STAKEHOLDERS:'Site managers, suppliers, operations leads'}},
+ rows:[
+  {c:'Experience in project management and coordination on sizeable, complex, aviation supply-chain projects in international environments',e:'Eight years of coordinating distribution across several sites, prioritising urgent deliveries and managing operational disruptions',r:'Demonstrated ability to coordinate interdependent operational flows under constraints',m:'No stated experience of aviation supply-chain projects in an international setting',n:'Acquire knowledge of the aviation procurement domain'},
+  {c:'Experience in logistics support, supply techniques and procedures for a large national or international environment (preferably military)',e:'Reallocation of vehicles and stock during disruptions; daily reports to operations managers',r:'The same type of work in a different operational context',m:'No evidence of logistics support in a military or multinational setting',n:'Introduction to logistics support in the defence sector'},
+  {c:'Experience administering high-value contracts and outline agreements in a technical and logistics context',e:'Escalations handled with suppliers. No contract-management role stated',r:'Partial overlap through supplier interaction only',m:'Experience of administering high-value contracts is not documented',n:'Develop the foundations of technical and logistics contract management'},
+  {c:'Broad experience in management of military or commercial aircraft materiel',e:'No experience of aircraft materiel stated',r:'No direct functional relationship: this is a domain requirement',m:'Experience of aircraft materiel is not documented',n:'Acquire basic knowledge of aircraft materiel'}],
+ elig:[['Bachelor’s-level qualification in a related discipline plus 3 years’ experience (alternatively, at least 6 years of progressive experience)','Candidate confirms','part'],['Experience of aircraft materiel (civil or military)','Not shown in the CV','none'],['Knowledge of Quality Assurance standards and policies','Not shown in the CV','none']],
+ gaps:['Aviation supply context in an international environment','Experience of aircraft materiel','Management of high-value contracts'],
+ module:{t:'Introduction to NATO Supply Chain and Weapon System Support'},
+ lp:{title:'Supply disruption scenario',
+  case:['You are responsible for coordinating the supply of spare parts for a fleet of support aircraft operating from three sites. A critical part for an aircraft grounded on the apron is two days late because of a shipping problem at the supplier.','This morning, Site 2 reports that its stock of a consumable item will run out at 13:00, and you have only one vehicle available for today’s deliveries. The operations manager is in a meeting until 11:00. The contractor has agreed to delivery delays of up to 17:00 for Site 3 only.','The supplier of the part asks for a decision by midday to confirm priority shipment, which carries an additional cost not provided for in the budget. You must decide what to do, in what order, whom to involve and what risks to accept.'],
+  q:['What do you do?','What do you do next?'],
+  r1:{P:['The grounded-aircraft part now leaves first. The other two deliveries wait and the single vehicle is fully committed.','reprioritised the operational flow after receiving new information, communicated the change to relevant stakeholders'],C:['Site managers are aligned, but 15 minutes pass and the vehicle is still unassigned.','coordinated the stakeholders before changing the plan'],E:['The operations lead asks for a proposed plan before releasing any extra resource.','escalated the situation before acting']},
+  r2:{P:['Site 2 is moved forward. The Site 3 hand-over slips to 17:00, which the contractor has already accepted.','moved the most time-critical delivery forward'],C:['All sites are told the revised timings. The vehicle limit remains.','aligned the sites on revised timings'],E:['A second vehicle is requested with a clear plan attached. The operations lead approves it.','escalated the resource constraint']},
+  auto:'First, I would confirm priority shipment of the part for the grounded aircraft, as that is the most costly stoppage: as soon as the operations manager leaves the meeting, I would ask for approval of the extra cost, with a short note on costs and risks. For Site 2, with stock lasting until 13:00 and a single vehicle, I would schedule delivery of the consumable before 13:00 and move Site 3 to 17:00, as already accepted by the contractor. I would inform the three sites and the supplier of the decision and, at 12:00, check that the shipment has left.',fz:[3,2,4]},
+ summary:'Marta’s demonstrated work relates closely to the core of the role. Evidence, gaps and a next step are explicit.'},
+
+karim:{name:'Karim Haddad',ini:'KH',file:'Karim_Haddad_CV.pdf',role:'Project manager · planning and stakeholder coordination',tone:'part',lib:LIB,
+ exp:['Project planning','Competing priorities','Stakeholder coordination','Progress reporting','Risk tracking'],
+ links:[[0,5],[1,5],[2,1],[3,3]],
+ vac:{code:'OE082/OE084',full:'NSPA OE082/OE084',title:'Junior Technician (Project Support)',flag:'c2',status:['Potential match with a gap','part']},
+ vacText:'This potential relationship is based on the Work Pattern identified from your experience and the functional requirements published for the vacancy.',
+ map:{main:'c2',sec:['c6','c1'],hit:'c2',bad:false},
+ wp:{name:LIB[5],dims:{OBJECT:'Project deliverables, schedules, supporting documents',ACTION:'Plan, track, document and report progress',CONSTRAINT:'Competing deadlines, limited analyst time',DECISION:'What to finish first, what to split or defer',OUTPUT:'Progress reports, documentation, risk analysis',STAKEHOLDERS:'Sponsors, team members, representatives'}},
+ rows:[
+  {c:'Proven ability to produce project administrative documents, with clear and accurate writing',e:'Progress updates and a project log kept for sponsors',r:'Same type of supporting work',m:'Project administrative documents under formal procedures are not shown',n:'Learn the organisation’s documentation standards'},
+  {c:'Good analytical skills, including retaining and recalling project information',e:'Risk tracking and prioritisation across workstreams',r:'Analysis used to support planning decisions',m:'No evidence of the level of analysis the post requires',n:'Practise analysing project data'},
+  {c:'Ability to manage competing priorities and adapt to changing requirements',e:'Balanced several workstreams and stakeholders with fixed deadlines',r:'Strong functional match on competing priorities',m:'No evident gap in the CV',n:'None at this stage'},
+  {c:'Demonstrated ability to work effectively in a multinational team in a fast-paced environment',e:'Coordinated stakeholders with differing expectations',r:'Partial: coordination is shown, a multinational setting is not stated',m:'No evidence of working in a multinational team',n:'Become familiar with multinational working procedures'},
+  {c:'Ability to handle budgets and perform routine financial calculations',e:'No budget management stated',r:'No demonstrated functional relationship',m:'Budget handling and routine financial calculations are not documented',n:'Learn the basics of project budgets and financial calculations'},
+  {c:'Work experience in the construction and engineering services domain',e:'No experience in this domain stated',r:'None: this is a domain requirement',m:'Experience in the construction and engineering services domain is not documented',n:'Introduction to the domain of the post'}],
+ elig:[['Higher vocational training in a related discipline plus 2 years’ experience (alternatively, secondary education plus 4 years)','Candidate confirms','part'],['Work experience in the construction and engineering services domain','Not shown in the CV','none']],
+ gaps:['Project administrative documents under formal procedures','Work in a multinational team','Budget management and financial calculations','Experience in the construction and engineering services domain'],
+ courses:[{t:'Project Documentation Standards',g:'Missing: formal documentation',h:'10 h',m:'Online'},{t:'Budgets and Financial Calculations for Project Support',g:'Missing: budget management',h:'14 h',m:'Online'},{t:'Working in Multinational Teams',g:'Missing: multinational setting',h:'6 h',m:'Online'}],
+ noLP:true,lp:{title:'Project deadline scenario',
+  case:['You coordinate delivery of a report for the steering committee, due on Thursday, and at the same time the documentation for an audit brought forward to Thursday at 12:00. A national representative asks for a different report format, and you have only one analyst available until Friday.'],
+  q:['What do you do?','What do you do next?'],
+  r1:{P:['The risk log is finished first because it feeds the report. The audit documentation now has less time.','reprioritised the work plan after receiving new information'],C:['Representatives are consulted, but the audit date still stands.','consulted stakeholders before changing the plan'],E:['The audit team is told the new date is a problem. They ask for a proposal.','raised the problem with the audit team']},
+  r2:{P:['Core audit documentation is split out for Thursday. The rest moves to Friday.','split the work to meet both deadlines'],C:['The report format is agreed with all six representatives.','agreed the report format with all representatives'],E:['The extra analyst time for Thursday is requested and approved.','escalated the resource constraint']},
+  auto:'I would complete the risk log first, because it feeds the committee report. I would then propose that the audit team receive the essential document on Thursday and the rest on Friday, as they have already accepted. I would agree a single report format with the six representatives and ask for a second analyst for Thursday, if possible.',fz:[3,3,4]},
+ summary:'Karim’s transferable project-management experience is visible. The gaps are specific and a learning path is realistic.'},
+
+luca:{name:'Luca Bianchi',ini:'LB',file:'Luca_Bianchi_CV.pdf',role:'Customer support · communication and problem solving',tone:'none',lib:LIB_L,
+ exp:['Customer request handling','Problem solving','Clear communication','Peer training'],
+ links:[[0,6],[1,6],[2,6]],
+ vac:{code:'IT186',full:'NSPA IT186',title:'IT Branch Chief',flag:'c4',status:['No suitable match','none']},
+ vacText:'The Work Pattern identified from your experience does not sufficiently correspond to the functional requirements of this vacancy. Generic similarities such as communication, support or problem solving do not establish a functional relationship, so the system does not create a match.',
+ map:{main:'c5',sec:[],hit:null,bad:true},
+ wp:{name:LIB_L[6],dims:{OBJECT:'Individual user requests and cases',ACTION:'Listen, diagnose, resolve or escalate',CONSTRAINT:'Response times, limited authority',DECISION:'Resolve now or escalate',OUTPUT:'Resolved cases, clear explanations',STAKEHOLDERS:'Customers, support colleagues'}},
+ rows:[
+  {c:'University degree in computer science equivalent to Master’s',e:'No qualification stated in the CV',r:'None. This is a mandatory criterion',m:'Qualification not shown',n:'This is a formal requirement, not a learning step'},
+  {c:'At least eight years of experience in positions related to the functions listed',e:'Customer support experience, not IT work as described in the notice',r:'Communication and problem solving are general capabilities',m:'Relevant IT experience is not shown',n:'Build relevant IT experience over time'},
+  {c:'Proven ability to supervise staff in applications development',e:'Trained colleagues on support tools',r:'Weak: training colleagues is not the same as supervising applications development',m:'Supervision of an applications-development team is not documented',n:'Not applicable at this stage'}],
+ elig:[['University degree in computer science equivalent to a Master’s','Not met','none'],['At least eight years of experience in positions related to the functions listed','Not met','none']],
+ gaps:[],lp:null,
+ summary:'Luca’s capabilities are real, but they do not meet the mandatory requirements of this role. The system says so instead of producing a recommendation.'}
+};
+D.marta.qs=['Can you confirm that you work as a logistics coordinator?','Can you confirm that you have 8 years of experience in civilian logistics?','Can you confirm that you have a good command of English?','Can you confirm that you have coordinated urgent deliveries across several sites?','Do you have experience of managing contracts with suppliers or contractors?'];
+D.marta.langIdx=2;
+D.marta.chatAuto=['Yes','Yes','Yes','Yes','Yes, I manage orders with suppliers but not formal contracts.'];
+D.karim.qs=['Can you confirm that you are a project manager?','Can you confirm that you have 5 years of experience in project management?','Can you confirm that you have a good command of English?','Have you worked with teams from several nations?'];
+D.karim.langIdx=2;
+D.karim.chatAuto=['Yes','Yes','Yes','No'];
+D.luca.qs=['Can you confirm that you work in customer support?','Do you hold a university degree in computer science?','Do you have work experience in IT roles?'];
+D.luca.chatAuto=['Yes','No','No'];
+D.marta.src={label:'LW003: Chief of Section, Supply Management Support of AWACS Fleet · NSPA Vacancies',url:'https://nspa-nato.career.emply.com/ad/lw003-chief-of-section-supply-management-support-of-awacs-fleet/jdk6si',note:'Ref. 2026_00469 · NATO grade 17:A3 · Luxembourg (Capellen)'};
+D.karim.src={label:'OE82,084: Junior Technician (Project Support) · reproduction of the notice on unjobnet.org',url:'https://www.unjobnet.org/jobs/detail/nspa-oe82084-junior-technician-project-support-89141802',note:'NATO grade 10:B4 · Luxembourg',third:true};
+D.luca.src={label:'IT-186: Chief of Branch (IT Applications and SLA Division) · NATO vacancies (PDF)',url:'https://www.nato.int/content/dam/nato/vacancies/pdf/IT%20Branch%20Chief,%20POOL,%20IT186.pdf',note:'Grade 20:A4 · Capellen'};
+
+Object.assign(D.marta.wp,{
+ core:'Prioritising interdependent activities, allocating constrained resources and re-planning when operational conditions change.',
+ cond:['Multiple interdependent activities must be coordinated','Priorities may change as new information appears','Resources or capacity are constrained','Decisions have operational consequences','Several stakeholders must remain coordinated','Plans must be adapted under time pressure'],
+ bound:['AWACS-specific supply knowledge','Defence-specific operational procedures','Role-specific systems and processes','Mandatory qualifications or eligibility requirements','Domain-specific terminology and practices'],
+ anchors:[['OBJECT / ACTION','Shows experience coordinating interdependent operational flows.'],['ACTION / OUTPUT','Shows experience sequencing and adapting operational activities into a working plan.'],['CONSTRAINT / DECISION','Shows experience allocating scarce resources when priorities compete.'],['STAKEHOLDERS','Shows experience keeping multiple operational stakeholders aligned.'],['CONSTRAINT / DECISION','Shows experience making and adapting decisions under time pressure.']],
+ obs:['Reprioritises when new information changes operational conditions','Allocates scarce resources according to operational priorities','Communicates changes to relevant stakeholders','Escalates constraints when they cannot be resolved locally','Maintains and adapts an operational plan as conditions change'],
+ tests:['prioritise changing demands','respond to constrained resources','adapt decisions when new information appears','coordinate stakeholders','explain and escalate decisions when necessary']});
+Object.assign(D.karim.wp,{
+ core:'Planning and tracking interdependent project work, protecting competing deadlines and keeping stakeholders aligned as priorities change.',
+ cond:['Several workstreams run in parallel with fixed deadlines','Priorities may change as sponsors or representatives raise new needs','Analyst or team capacity is limited','Progress must be documented and reported','Several stakeholders must remain aligned'],
+ bound:['Construction and engineering domain knowledge','Organisation-specific documentation standards and procedures','Budget and financial procedures of the post','Mandatory qualifications or eligibility requirements','Domain-specific terminology and practices'],
+ anchors:[['ACTION / OUTPUT','Shows experience turning project work into a plan with defined outputs.'],['CONSTRAINT / DECISION','Shows experience deciding between competing deadlines.'],['STAKEHOLDERS','Shows experience keeping sponsors and representatives aligned.'],['OUTPUT','Shows experience producing regular progress reports.'],['DECISION / CONSTRAINT','Shows experience anticipating risks and adjusting priorities.']]});
+Object.assign(D.luca.wp,{
+ core:'Listening to individual requests, diagnosing the cause and either resolving the case or escalating it with a clear explanation.',
+ cond:['Requests arrive one at a time and must be answered promptly','Authority to act is limited and escalation is sometimes needed','Explanations must be clear to non-specialists'],
+ bound:['Supervision of applications development','University-level computer science qualification','The years of IT experience required by the post','Mandatory qualifications or eligibility requirements','Domain-specific terminology and practices'],
+ anchors:[['OBJECT / ACTION','Shows experience handling individual requests from first contact to resolution.'],['DECISION','Shows experience diagnosing problems and deciding whether to resolve or escalate.'],['OUTPUT / STAKEHOLDERS','Shows experience explaining outcomes clearly to customers.'],['STAKEHOLDERS','Shows experience supporting colleagues who work with the same tools.']]});
+const WP_DEF='The Work Pattern identifies functional relevance. It does not replace domain knowledge, mandatory qualifications or formal eligibility requirements.';
+const FQ=['How clear was the situation described to you?','How similar are these decisions to what you have done in your own work?','How well could you see yourself doing work made up of decisions like these?'];
+const FSCALE=['Not at all','Slightly','Partly','Quite','Completely'];
+const ORDER=['luca','marta','karim'];
+const STAT=['Reading the CV and extracting activities…','Translating experience into functional language…','Comparing with the Work Pattern library…','Identifying relevant Work Patterns…'];
+const S={stage:'home',c:null,fname:'',step:0,max:0,off:{},plan:{},lp:{},refl:{},auto:false,chat:{},extra:{}};
+function resetK(k){S.off[k]={};S.plan[k]={};S.lp[k]={ph:'sched',txt:'',fz:[]};S.refl[k]='';S.extra[k]=[];S.chat[k]={i:0,log:[],wait:'yn',ans:[]}}
+ORDER.forEach(resetK);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const chip=(t,s)=>`<span class="chip ${s}">${esc(t)}</span>`;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const docIcon='<svg width="14" height="16" viewBox="0 0 14 16" fill="none" aria-hidden="true"><path d="M1 1h8l4 4v10H1z" stroke="currentColor" stroke-width="1.4"/><path d="M9 1v4h4" stroke="currentColor" stroke-width="1.4"/></svg>';
+const skip=k=>!D[k].lp;
+const noLP=k=>!!D[k].noLP; /* no-match journeys skip gaps, learn, prove */
+
+/* ---------- guided confirmation ---------- */
+function chatStart(k){const C=S.chat[k];C.log=[{f:'bot',t:'I have read your CV. Let us check the main information together.'},{f:'bot',t:D[k].qs[0]}];C.i=0;C.wait='yn';C.ans=[]}
+function chatAnswer(val,isText){const k=S.c,C=S.chat[k],qs=D[k].qs;
+ if(C.wait==='done')return;
+ C.log.push({f:'me',t:val});
+ if(isText){S.extra[k].push(val);C.log.push({f:'bot',t:'Thank you. I am adding this information to your profile.'})}
+ else if(val==='No')C.log.push({f:'bot',t:'Understood. I will not treat it as confirmed.'});
+ else C.log.push({f:'bot',t:'Noted.'});
+ if(C.i===D[k].langIdx&&!isText)S.extra[k].push(val==='Yes'?'English proficiency confirmed':'English proficiency not confirmed');
+ C.ans.push({q:qs[C.i],a:val});C.i++;
+ if(C.i<qs.length){C.log.push({f:'bot',t:qs[C.i]})}
+ else{C.log.push({f:'bot',t:'Thank you. I have recorded your confirmations and will now analyse your experience.'});C.wait='done'}
+}
+function chatView(){const k=S.c,C=S.chat[k],done=C.wait==='done';
+ return `<section class="panel"><div><div class="kicker">Confirmation of information</div><h2>Please confirm what we have read in your CV</h2><p class="lead">Answer Yes or No, or write a correction. These are guided questions: this is not an AI assistant, and your answers are not scored.</p><p class="note" style="margin:0">In line with the principles of Regulation (EU) 2016/679 (GDPR), you may rectify or remove any information extracted from your CV at any time.</p></div>
+ <div class="chat" id="chat">${C.log.map((m,i)=>`<div class="msg ${m.f}${i>=C.log.length-2?' new':''}">${esc(m.t)}</div>`).join('')}</div>
+ ${done?`<div class="foot" style="justify-content:flex-end"><button class="btn primary" data-a="goan">Continue to the analysis</button></div>`:`<div class="chatin"><button class="btn" data-a="yes">Yes</button><button class="btn" data-a="no">No</button><input type="text" id="chin" placeholder="Or type an answer" aria-label="Answer"><button class="btn primary" data-a="send">Send</button></div>`}</section>`}
+
+/* ---------- screens ---------- */
+function home(){
+ const d=D.marta;
+ return `<section class="panel"><div class="kicker">My profile</div>
+ <div class="profile"><div class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8.5" r="4" stroke="currentColor" stroke-width="2"/><path d="M4.5 20c1.2-4 4-5.5 7.5-5.5s6.3 1.5 7.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div><b>No CV uploaded</b><span>Upload your CV to begin</span></div></div>
+ <div><h1>Start your transferability review</h1><p class="lead">Upload your CV to identify transferable Work Patterns and explore potentially relevant civilian vacancies.</p><p class="note" style="margin:6px 0 0">Your CV and your answers are processed in line with the principles of Regulation (EU) 2016/679 (GDPR), solely for the purposes of this review. No decision is taken by automated means alone (cf. Article 22 GDPR): every outcome remains subject to human review.</p></div>
+ <div class="upl"><button class="btn primary lg" data-a="upload" type="button">Upload CV</button></div>
+ </section>
+ <section class="panel"><div class="kicker">Or try an example CV</div><div class="samples">${ORDER.filter(k=>!(S.auto&&k==='karim')).map(k=>`<button class="sample" data-a="sample" data-k="${k}" type="button"><span class="doc">${docIcon}${D[k].file}</span><b>${D[k].name}</b><span>Use this CV</span></button>`).join('')}</div></section>`;
+}
+function uploaded(){
+ return `<section class="panel"><div class="kicker">Start your transferability review</div><div class="upl"><span class="file">${docIcon}${esc(S.fname)}</span><div class="ok">CV UPLOADED</div><div class="ok">✓ Upload complete</div></div></section>`;
+}
+function analysing(){
+ return `<section class="panel"><div><div class="kicker">Work Pattern analysis</div><h2 class="caps">Analysing your experience</h2><p class="lead">The work you have done in companies is translated into Work Patterns, so that it can be read in terms of civilian roles. Job titles are not compared.</p></div><div class="flow3"><span>Your work in a company</span><em>→</em><span>Work Pattern</span><em>→</em><span class="last">Civilian role (vacancy)</span></div><div class="status" id="status"></div><div id="an"></div></section>`;
+}
+function anHtml(t){
+ const d=D[S.c];
+ const status=Math.min(3,Math.floor(t/1350));
+ const expN=t<300?0:Math.min(d.exp.length,Math.floor((t-300)/500)+1);
+ const linkN=d.links.filter((l,j)=>t>=2000+j*600).length;
+ const linked=d.links.slice(0,linkN);
+ const hitSet=new Set(linked.map(l=>l[1]));
+ const scan=t<700||t>=4400?-1:Math.floor((t-700)/520)%7;
+ const done=t>=5400;
+ const grp={};d.links.forEach(l=>{(grp[l[1]]=grp[l[1]]||[]).push(l[0])});
+ const gl=Object.entries(grp).sort((a,b)=>b[1].length-a[1].length);
+ const why=gl.map(([li,ex],gi)=>`<div class="card"><div class="chain5" style="text-transform:none;letter-spacing:0">${ex.map(i=>`<span>${esc(d.exp[i])}</span>`).join('<em>+</em>')}</div><div>↓ <b>${esc(d.lib[li])}</b></div>${chip(gi===0?'✓ Relevant Work Pattern':'✓ Related Work Pattern',gi===0?'ok':'part')}</div>`).join('');
+ const nRel=new Set(d.links.map(l=>l[1])).size;
+ const left=`<div class="card tint"><div class="kicker">Your work in a company</div><ul class="exps">${d.exp.slice(0,expN).map((x,i)=>{const lk=linked.filter(l=>l[0]===i);return `<li>${esc(x)}${lk.map(l=>`<small>↓ ${esc(d.lib[l[1]])} ✓</small>`).join('')}</li>`}).join('')}</ul><p class="note">Your experience is compared with these Work Patterns to identify those that are transferable.</p></div>`;
+ const right=`<div class="card tint"><div class="kicker">Work Pattern</div><p class="note" style="margin:0">Recurring structures of work (activities, decisions and constraints) identified in published civilian vacancies: the bridge between your work and a civilian role.</p><ul class="lib">${d.lib.map((x,i)=>`<li class="${hitSet.has(i)?'hit':i===scan?'scan':''}"><span>${esc(x)}</span></li>`).join('')}</ul></div>`;
+ return {status:done?'':STAT[status],html:`<div class="acols">${left}${right}</div>${done?`<div class="done-msg"><b>WORK PATTERN ANALYSIS COMPLETE</b>${nRel} potentially relevant Work Pattern${nRel>1?'s':''} identified</div><div class="kicker" style="margin-top:6px">Why a Work Pattern becomes relevant</div><div class="two" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">${why}</div>`:''}`};
+}
+function found(){
+ const d=D[S.c];
+ return `<section class="panel"><div><div class="kicker">Primary Work Pattern</div><h2 class="caps">${esc(d.wp.name)}</h2><p class="lead">This Work Pattern represents the underlying structure of the work demonstrated in your experience.</p><p class="note" style="margin:6px 0 0">The Work Pattern translates work done in companies into the functional language of civilian roles: it is neither a job title nor a vacancy.</p></div>
+ <div class="dimgrid">${Object.entries(d.wp.dims).map(([a,b])=>`<div><label>${a}</label>${esc(b)}</div>`).join('')}</div>
+ <div class="foot" style="justify-content:flex-end"><button class="btn primary" data-a="tow">Continue to Work Pattern</button></div></section>`;
+}
+function mapSvg(d){
+ const m=d.map;let s='<svg class="cl" viewBox="0 0 760 440" role="img" aria-label="Work Patterns and position of the experience"><g>';
+ const cvx=56,cvy=50;
+ const line=(a,cls)=>`<line class="edge ${cls}" x1="${cvx}" y1="${cvy}" x2="${CL[a].x}" y2="${CL[a].y}"/>`;
+ s+=line(m.main,'');m.sec.forEach(a=>s+=line(a,'dash'));
+ if(m.bad){s+=`<line class="edge bad" x1="${CL.c5.x+CL.c5.r}" y1="392" x2="${CL.c4.x-CL.c4.r}" y2="392"/><text class="x" x="${(CL.c5.x+CL.c4.x)/2}" y="398" text-anchor="middle">✕</text><text x="${(CL.c5.x+CL.c4.x)/2}" y="418" text-anchor="middle" font-size="11.5" style="fill:var(--none)">no functional link</text>`}
+ s+='</g>';
+ Object.entries(CL).forEach(([id,c])=>{
+  const cls=id===m.main?'main':m.sec.includes(id)?'sec':'';
+  s+=`<g class="node ${cls}"><circle class="base" cx="${c.x}" cy="${c.y}" r="${c.r}"/><circle class="tint" cx="${c.x}" cy="${c.y}" r="${c.r}"/>`;
+  const n=c.t.length;c.t.forEach((ln,i)=>{s+=`<text x="${c.x}" y="${c.y+(i-(n-1)/2)*15+4}" text-anchor="middle" font-size="12">${ln}</text>`});
+  s+='</g>';
+ });
+ const f=FLAG[d.vac.flag],fc=CL[d.vac.flag],fcls=m.hit?'hit':m.bad?'bad':'';
+ s+=`<g class="flag ${fcls}"><rect x="${fc.x+f[0]}" y="${fc.y+f[1]}" width="${d.vac.code.length*7.2+22}" height="26" rx="13"/><text x="${fc.x+f[0]+11}" y="${fc.y+f[1]+17}">${d.vac.code}</text></g>`;
+ s+=`<g class="cv"><rect x="${cvx-30}" y="${cvy-20}" width="60" height="40" rx="8"/><text x="${cvx}" y="${cvy+5}" text-anchor="middle" font-size="14">CV</text></g></svg>`;
+ return s;
+}
+const foot=(label,act,back)=>`<div class="foot">${back?`<button class="btn" data-a="back">Back</button>`:'<span></span>'}${label?`<button class="btn primary" data-a="${act}">${label}</button>`:''}</div>`;
+
+function s0(d,k){const off=S.off[k];
+ return `<section class="panel"><div><div class="kicker">Translate</div><h2>What you have done, and the type of work it represents</h2><p class="lead">Check each activity. Remove anything that is wrong. Only what stays is used.</p></div>
+ <div class="chips">${S.extra[k].map(t=>`<span class="act">${esc(t)}<span class="chip info">Added by you</span></span>`).join('')}${d.exp.map((t,i)=>`<span class="act ${off[i]?'off':''}">${esc(t)}<button data-a="cvt" data-i="${i}" aria-label="${off[i]?'Restore':'Remove'}: ${esc(t)}">${off[i]?'↺':'×'}</button></span>`).join('')}</div>
+ <p class="note" style="margin:0">Work done in companies is translated into Work Patterns and linked to civilian roles, not to job titles.</p>
+ <div class="map"><div class="mapbox">${mapSvg(d)}<div class="legend"><span><i></i>strongest relationship</span><span><i class="d"></i>partial relationship</span><span>Tag = published civilian vacancy</span></div><p class="note" style="margin:6px 10px 8px">The highlighted Work Pattern is the strongest functional relationship identified from your experience.</p></div>
+ <div class="card tint"><div class="kicker">Work Pattern</div><div class="pname">${esc(d.wp.name)}</div><div class="dims">${Object.entries(d.wp.dims).map(([a,b])=>`<div><label>${a}</label>${esc(b)}</div>`).join('')}</div></div></div>
+ <div class="card tint"><div class="kicker">Transferable core</div><p style="margin:0">${esc(d.wp.core)}</p></div>
+ <div class="two"><div class="card"><div class="kicker">Transfer conditions</div><p class="note" style="margin:0">These conditions indicate when the underlying work structure may remain relevant across different domains.</p><ul class="gaplist">${d.wp.cond.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+ <div class="card"><div class="kicker">Transfer boundaries</div><p class="note" style="margin:0">What does not transfer automatically.</p><ul class="gaplist">${d.wp.bound.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div>
+ <div class="callout sep"><b>Formal eligibility remains separate</b>${WP_DEF}</div>
+ <div class="card"><div class="kicker">Evidence anchors</div><p class="note" style="margin:0">Each item of CV evidence is traced to a dimension of the Work Pattern and to the functional reason it supports it.</p>${d.exp.map((t,i)=>{const a=d.wp.anchors[i];return off[i]||!a?'':`<div class="anc"><div class="a1"><span class="al">CV evidence</span>${esc(t)}</div><div class="a2"><span class="al">→ Work Pattern dimension</span><b>${a[0]}</b></div><div class="a3"><span class="al">→ Why it supports the pattern</span>${esc(a[1])}</div></div>`}).join('')}</div>
+ <p class="note" style="margin:0">Work Pattern library validated by human subject-matter experts.</p>
+ ${foot('Continue to potential civilian vacancies','next',false)}</section>`;
+}
+function s1(d,k){const st=d.vac.status;
+ return `<section class="panel"><div><div class="kicker">Explain</div><h2 class="caps">${k==='luca'?'Civilian vacancy reviewed':'Potential civilian vacancies'}</h2></div>
+ <div class="vac"><span class="t"><b class="code">${d.vac.code} –</b> ${esc(d.vac.title)}</span>${chip(st[0],st[1])}</div>
+ <p class="note" style="margin:0">Public source of the criteria: <a href="${d.src.url}" target="_blank" rel="noopener">${esc(d.src.label)}</a> · ${esc(d.src.note)} · consulted on 11 October 2026${d.src.third?'. Third-party reproduction: the official notice could not be reached and should be checked on the NSPA website.':'.'}</p>
+ <p class="lead" style="margin:0">${esc(d.vacText)}</p>
+ <div><h3>${k==='luca'?'Why a match is not supported':'Why this match may be relevant'}</h3></div>
+ <div class="tbl"><table class="ev"><thead><tr><th>Civilian vacancy criterion</th><th>Your evidence</th><th>Functional relationship</th><th>Missing evidence</th><th>Learning step</th></tr></thead><tbody>${d.rows.map(r=>`<tr><td>${esc(r.c)}</td><td>${esc(r.e)}</td><td>${esc(r.r)}</td><td class="m">${esc(r.m)}</td><td>${esc(r.n)}</td></tr>`).join('')}</tbody></table></div>
+ <div class="callout sep"><b>Formal eligibility remains separate</b>A potential functional match does not compensate for mandatory qualifications or eligibility criteria.</div>
+ <div class="card"><div class="kicker">Formal eligibility</div><div>${d.elig.map(e=>`<div class="req"><span>${esc(e[0])}</span>${chip(e[1],e[2])}</div>`).join('')}</div></div>
+ ${foot(skip(k)?'Continue to outcome':'Continue to gaps','next',true)}</section>`;
+}
+function s2(d,k){
+ return `<section class="panel"><div><div class="kicker">Identify gaps</div><h2>Where the evidence stops</h2></div>
+ <div class="two"><div class="card tint"><div class="kicker">What is not yet demonstrated</div><ul class="gaplist">${d.gaps.map(g=>`<li>${esc(g)}</li>`).join('')}</ul></div>
+ <div class="card tint"><div class="kicker">Possible next step</div><p style="margin:0">Develop or demonstrate the relevant domain knowledge through appropriate learning or practical exposure.</p></div></div>
+ <div class="callout">Gaps are shown as next steps, not as a rejection.</div>
+ ${foot('Continue to learning','next',true)}</section>`;
+}
+function s3(d,k){
+ let body;
+ if(d.module){body=`<div class="module"><span class="chip info" style="align-self:flex-start">NSPA e-Learning</span><div class="q">${esc(d.module.t)}</div><p style="margin:0">We recommend the NSPA e-Learning module “${esc(d.module.t)}” to address the identified gap. It is a suggested step, not a condition for taking part in the Live Project.</p><div><button class="btn" data-a="plan" data-i="0" aria-pressed="${!!S.plan[k][0]}">${S.plan[k][0]?'Added to my learning plan':'Add to my learning plan'}</button></div></div>`}
+ else{body=`<div class="courses">${d.courses.map((c,i)=>`<div class="course"><span class="gapt">${esc(c.g)}</span><b>${esc(c.t)}</b><div class="meta">${chip(c.h,'plain')}${chip(c.m,'plain')}</div><button class="btn" data-a="plan" data-i="${i}" aria-pressed="${!!S.plan[k][i]}">${S.plan[k][i]?'Added to my learning plan':'Add to learning plan'}</button></div>`).join('')}</div>`}
+ return `<section class="panel"><div><div class="kicker">Learn</div><h2>A targeted step to close the gap</h2></div>${body}
+ <div class="flow3"><span>Gap identified</span><em>→</em><span>Targeted learning</span><em>→</em><span class="last">${noLP(k)?'Try the analysis again':'An opportunity to demonstrate the capability'}</span></div>
+ ${foot(noLP(k)?'Continue to outcome':'Proceed to Live Project','next',true)}</section>`;
+}
+const LPD=new Date(2026,9,21,12,0);
+const LPD_TXT=LPD.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+' · 12:00';
+function daysTo(){return Math.ceil((LPD-new Date())/86400000)}
+function s4(d,k){
+ const L=d.lp,P=S.lp[k];
+ if(P.ph==='sched'){const n=daysTo();
+  const lab='Live Project starts in 10 days';
+  return `<section class="panel"><div><div class="kicker">Prove</div><h2 class="caps">${lab}</h2></div>
+  <div class="sched"><span class="big">${LPD_TXT}</span><span>The scenario will become available at the scheduled start time.</span></div>
+  <div class="card"><div class="kicker">What the Live Project is</div><p style="margin:0">The Live Project is a practical exercise in which you are presented with a realistic work case, linked to your Work Pattern and set in a new operational context. No prior experience in this specific civilian context is required. The Live Project tests how you apply the capability, not whether you already know the domain terminology.</p><div class="kicker" style="margin-top:6px">Before you begin</div><ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px"><li>The scenario is based on your identified Work Pattern.</li><li>You will be asked to make decisions in a changing operational context.</li><li>There is no single correct answer.</li><li>Your responses become structured evidence for human assessment.</li><li>You may decide not to proceed before starting.</li></ul></div>
+  <div class="card tint"><div class="kicker">Project built from your Work Pattern</div><div class="pname">${esc(d.wp.name)}</div><p style="margin:0">This Live Project gives you an opportunity to demonstrate the capability in a new operational context.</p></div>
+  <div class="two"><div class="card"><div class="kicker">Live Project tests</div><p class="note" style="margin:0">The scenario will test whether the candidate can:</p><ul class="gaplist">${d.wp.tests.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+  <div class="card"><div class="kicker">Observable behaviours</div><p class="note" style="margin:0">These behaviours provide the bridge between the Work Pattern and the Live Project.</p><ul class="gaplist">${d.wp.obs.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div>
+  <div class="callout">The candidate is not asked to prove that they have already performed this exact job. They are given an opportunity to demonstrate how they apply the underlying capability in a new context.</div>
+  <div class="foot"><button class="btn" data-a="back">Back</button><button class="btn" data-a="startdemo">Start demo now</button></div></section>`}
+ const done=P.fz.filter(v=>v!==undefined).length===FQ.length;
+ const ch=['Scenario','Free-text response','Reflection questions'];
+ const on=P.ph==='run'?[0,1]:[0,1,2];
+ let h=`<section class="panel"><div><div class="kicker">Live Project</div><h2>${esc(L.title)}</h2></div>
+ <div class="chain5">${ch.map((c,i)=>`<span class="${on.includes(i)?'on':''}">${c}</span>${i<2?'<em>→</em>':''}`).join('')}</div>
+ <div class="card"><div class="kicker">The case</div>${L.case.map(t=>`<p style="margin:0">${esc(t)}</p>`).join('')}</div>`;
+ if(P.ph==='run'){
+  h+=`<div><h3 class="caps" style="text-transform:uppercase;letter-spacing:.04em">What do you do?</h3><p class="note" style="margin:2px 0 8px">Describe in your own words what you decide, in what order and why. There is no single correct answer.</p><textarea id="lptxt" aria-label="Your response" placeholder="Write your response here">${esc(P.txt)}</textarea></div>
+  <div class="foot"><button class="btn" data-a="back">Back</button><button class="btn primary" data-a="sendlp">Submit response</button></div>`;
+ }else{
+  h+=`<div class="sit"><b>Your response</b><br>${esc(P.txt)}</div>
+  <div><h3 class="caps" style="text-transform:uppercase;letter-spacing:.04em">Guided reflection</h3><p class="note" style="margin:2px 0 4px">Please indicate how far you agree. These questions are intended to help you assess the opportunity, not to produce a score.</p>
+  ${FQ.map((q,i)=>`<div class="fzq"><b>${q}</b><div class="fz">${FSCALE.map((l,j)=>`<button data-a="fz" data-q="${i}" data-v="${j}" class="${P.fz[i]===j?'on':''}">${l}</button>`).join('')}</div></div>`).join('')}</div>
+  <div class="foot" style="justify-content:flex-end"><button class="btn primary" data-a="lpdone" ${done?'':'disabled'}>Complete Live Project</button></div>`;
+ }
+ return h+'</section>';
+}
+function obs(d,k){const P=S.lp[k];return P.txt}
+function s5(d,k){
+ if(noLP(k))return `<section class="panel"><div><div class="kicker">Decide</div><h2>Outcome</h2></div>
+ <div class="verdict" style="background:var(--part-soft);border-color:var(--part)"><div class="kicker">${d.vac.code}: ${esc(d.vac.title)}</div><h2>Potential match: further learning first</h2><span>${esc(d.summary)}</span></div>
+ <div class="card"><div class="kicker">Learning to close the gaps</div>${d.courses.map((c,i)=>`<div class="req"><span><b>${esc(c.t)}</b><br><small style="color:var(--muted)">${esc(c.g)}</small></span>${chip(S.plan[k][i]?'In your plan':c.h,S.plan[k][i]?'ok':'plain')}</div>`).join('')}</div>
+ <div class="callout">Some requirements are not yet evidenced, so the Live Project is not available for the time being. Please complete the suggested learning and try the analysis again: your experience remains valid, and the final decision always rests with a person.</div>
+ <div class="foot"><button class="btn" data-a="back">Back</button><button class="btn primary" data-a="retry">Try the analysis again</button></div></section>`;
+ if(skip(k))return `<section class="panel"><div><div class="kicker">Decide</div><h2>Outcome</h2></div>
+ <div class="verdict none"><div class="kicker">${d.vac.code} – ${esc(d.vac.title)}</div><h2>No suitable match</h2><span>${esc(d.summary)}</span></div>
+ <p class="lead" style="margin:0">No sufficiently relevant Work Pattern was identified for this vacancy based on the available evidence.</p>
+ <div class="callout">This does not mean that the candidate lacks capability. It means that the available evidence does not establish a sufficiently relevant functional relationship with this vacancy. No suitable match is better than an artificial match: your experience remains valid, and you can review again when the requirements are met.</div>
+ <div class="chain5"><span class="on">Experience</span><em>→</em><span class="on">Work Pattern</span><em>→</em><span class="on">Vacancy</span><em>→</em><span class="on">Insufficient functional relationship</span><em>→</em><span class="on">No suitable match</span><em>→</em><span>No Live Project</span></div>
+ <div class="foot"><button class="btn" data-a="back">Back</button><span></span></div></section>`;
+ return `<section class="panel"><div><div class="kicker">Decide</div><h2 class="caps">Structured evidence</h2></div>
+ <div class="two"><div class="card tint"><div class="kicker">Work Pattern</div><div class="pname">${esc(d.wp.name)}</div></div>
+ <div class="card tint"><div class="kicker">Candidate’s response</div><p style="margin:0">${esc(obs(d,k))}</p></div></div>
+ <div><h3 class="caps" style="text-transform:uppercase;letter-spacing:.04em">Candidate reflection</h3><p class="note" style="margin:2px 0 8px">Your own view of what you decided and how far this kind of work suits you.</p>
+ ${FQ.map((q,i)=>`<div class="req"><span>${q}</span><b>${FSCALE[S.lp[k].fz[i]]||'—'}</b></div>`).join('')}</div>
+ <div class="pending"><b>HUMAN ASSESSMENT</b>${chip('Pending','part')}<span>Final assessment remains subject to human review.</span></div>
+ <div class="callout">The AI supports experience translation, evidence structuring and Live Project generation. It does not decide who is hired.</div>
+ <div class="foot"><button class="btn" data-a="back">Back</button><span></span></div></section>`;
+}
+const VIEWS=[s0,s1,s2,s3,s4,s5];
+
+/* ---------- shell ---------- */
+function endView(){
+ return `<section class="panel"><div><div class="kicker">In summary</div><h2>The system does not decide who gets hired</h2></div>
+ <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px"><li>It translates experience into functional Work Patterns.</li><li>It explains why a vacancy may be relevant.</li><li>It shows the evidence behind the relationship.</li><li>It identifies what is missing.</li><li>It suggests realistic learning steps.</li><li>It provides a Live Project where appropriate.</li><li>It structures observable evidence.</li><li>It keeps final assessment with human experts.</li></ul>
+ <div class="card"><div class="kicker">Where a functional relationship is supported</div><div class="chain5">${['Experience','Work Pattern','Vacancy','Evidence','Gap','Learning','Live Project','Observable capability','Human assessment'].map(x=>`<span class="on">${x}</span>`).join('<em>→</em>')}</div></div>
+ <div class="card"><div class="kicker">Where it is not</div><div class="chain5">${['Experience','Work Pattern','Vacancy','Insufficient functional relationship','No suitable match'].map(x=>`<span class="on">${x}</span>`).join('<em>→</em>')}</div></div>
+ <div class="callout">Prove the Transfer does not ask whether the candidate has already done the job. It explains what capability their experience represents, where that capability may transfer, what is missing and, where appropriate, gives them a structured opportunity to demonstrate it in a new context.</div></section>`;
+}
+function onSet(){
+ if(S.stage==='home')return [];
+ if(S.stage==='end')return [0,1,2,3,4,5];
+ if(S.stage==='chat'||S.stage==='up')return [0];
+ if(S.stage!=='app')return [0,1];
+ return [[0,1],[2],[3],[3],[4],[5]][S.step];
+}
+function render(keep){
+ const m=$('#main');
+ if(S.stage==='home')m.innerHTML=home();
+ else if(S.stage==='up')m.innerHTML=uploaded();
+ else if(S.stage==='chat')m.innerHTML=chatView();
+ else if(S.stage==='end')m.innerHTML=endView();
+ else if(S.stage==='an')m.innerHTML=analysing();
+ else if(S.stage==='found')m.innerHTML=found();
+ else{const d=D[S.c];m.innerHTML=VIEWS[S.step](d,S.c)}
+ const cur=S.stage==='app'?S.step:(S.stage==='home'?-1:0);
+ $('#proc').innerHTML='<button type="button" aria-current="step" tabindex="-1">Selection process</button>';
+ const on=onSet();
+ $('#aside').innerHTML=`<div class="read"><div class="kicker">How your profile is read</div>${READ.map((r,i)=>{const na=i===4&&S.c&&(skip(S.c)||noLP(S.c));return `<div class="ri ${on.includes(i)?'on':''} ${na?'na':''}"><i>0${i+1}</i><div><b>${r[0]}</b><span>${na?(skip(S.c)?'Not available: no suitable match':'Not available yet: complete the suggested learning first'):r[1]}</span></div></div>`}).join('')}</div>
+ <div class="gov"><b>AI supports the process.</b> Humans remain responsible for assessment.<br>AI supports experience translation, evidence structuring and Live Project generation. Final assessment remains subject to human review.<br>Work Pattern library validated by human subject-matter experts.</div>`;
+ if(!keep)window.scrollTo({top:0,behavior:S.auto?'smooth':'auto'});
+ const ch=$('#chat');if(ch)ch.scrollTop=ch.scrollHeight;
+}
+let anTimer=null;
+function startUpload(k,name){
+ clearInterval(anTimer);S.c=k;S.fname=name||D[k].file;resetK(k);S.step=0;S.max=0;chatStart(k);
+ S.stage='up';render();
+ setTimeout(()=>{if(S.stage==='up'){S.stage='chat';render()}},1300);
+}
+function startAnalysis(){
+ return new Promise(res=>{
+  S.stage='an';render();
+  const t0=Date.now();clearInterval(anTimer);let lastHtml='';
+  anTimer=setInterval(()=>{
+   const t=Date.now()-t0;
+   if(S.stage!=='an'){clearInterval(anTimer);return res()}
+   const o=anHtml(t);$('#status').textContent=o.status;
+   if(o.html!==lastHtml){lastHtml=o.html;$('#an').innerHTML=o.html}
+   if(t>=6400){clearInterval(anTimer);S.stage='found';render();res()}
+  },120);
+ });
+}
+function go(i){if(S.stage==='app'&&i<=S.max){S.step=i;render()}}
+function next(){let n=S.step+1;if(skip(S.c)&&n>=2&&n<=4)n=5;if(noLP(S.c)&&n===4)n=5;S.step=n;S.max=Math.max(S.max,n);render()}
+function back(){let n=S.step-1;if(skip(S.c)&&n>=2&&n<=4)n=1;if(noLP(S.c)&&n===4)n=3;S.step=Math.max(0,n);render()}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-a]');if(!b||b.disabled||S.auto)return;
+ const a=b.dataset.a,i=+b.dataset.i,k=S.c;
+ if(a==='upload')startUpload('marta','Marta_Rossi_CV.pdf');
+ else if(a==='sample')startUpload(b.dataset.k);
+ else if(a==='yes'){chatAnswer('Yes');render(true)}
+ else if(a==='no'){chatAnswer('No');render(true)}
+ else if(a==='send'){const v=($('#chin').value||'').trim();if(v){chatAnswer(v,true);render(true)}}
+ else if(a==='goan')startAnalysis();
+ else if(a==='tow'){S.stage='app';S.step=0;S.max=0;render()}
+ else if(a==='go')go(i);
+ else if(a==='next')next();
+ else if(a==='back')back();
+ else if(a==='cvt'){S.off[k][i]=!S.off[k][i];render(true)}
+ else if(a==='plan'){S.plan[k][i]=!S.plan[k][i];render(true)}
+ else if(a==='startdemo'){S.lp[k].ph='run';render(true)}
+ else if(a==='sendlp'){const v=($('#lptxt').value||'').trim();if(v){S.lp[k].txt=v;S.lp[k].ph='fz';render(true)}}
+ else if(a==='fz'){S.lp[k].fz[+b.dataset.q]=+b.dataset.v;render(true)}
+ else if(a==='lpdone'){next()}
+ else if(a==='retry'){S.stage='home';render()}
+});
+document.addEventListener('input',e=>{if(e.target.id==='lptxt')S.lp[S.c].txt=e.target.value});
+$('#home').addEventListener('click',()=>{if(S.auto)return;clearInterval(anTimer);S.stage='home';S.c=null;S.step=0;S.max=0;render()});
+
+/* ---------- auto-play (press P for Luca then Marta, Shift+P for Marta only, Esc to stop) ---------- */
+async function typeInto(txt){const t=$('#lptxt');if(!t)return;t.value='';for(const ch of txt){if(!S.auto)return;t.value+=ch;await sleep(14)}S.lp[S.c].txt=txt}
+async function w(ms){const end=Date.now()+ms;while(S.auto&&Date.now()<end)await sleep(100)}
+async function journey(k){
+ S.stage='home';S.c=null;S.step=0;S.max=0;render();await w(k==='luca'?1200:2200);if(!S.auto)return;
+ startUpload(k);await w(2000);if(!S.auto)return;
+ for(const ans of D[k].chatAuto){
+  await w(k==='luca'?800:1100);if(!S.auto)return;
+  if(/^(Yes|No)$/.test(ans)){chatAnswer(ans);render(true)}
+  else{const inp=$('#chin');for(const ch of ans){if(!S.auto)return;inp.value+=ch;await sleep(22)}await w(500);chatAnswer(ans,true);render(true)}
+ }
+ await w(1500);if(!S.auto)return;
+ await startAnalysis();if(!S.auto)return;
+ await w(2400);if(!S.auto)return;
+ S.stage='app';S.step=0;S.max=0;render();await w(k==='luca'?4500:14000);if(!S.auto)return;
+ next();await w(k==='luca'?7000:12000);if(!S.auto)return;
+ if(skip(k)){next();await w(6000);return}
+ next();await w(6500);if(!S.auto)return;
+ next();await w(6500);if(!S.auto)return;
+ next();await w(10000);if(!S.auto)return;
+ if(noLP(k)){await w(4500);return}
+ S.lp[k].ph='run';render(true);await w(3200);if(!S.auto)return;
+ await w(2500);if(!S.auto)return;
+ await typeInto(D[k].lp.auto);await w(1200);if(!S.auto)return;
+ S.lp[k].ph='fz';render(true);await w(2500);if(!S.auto)return;
+ for(let i=0;i<FQ.length;i++){S.lp[k].fz[i]=D[k].lp.fz[i];render(true);await w(1800);if(!S.auto)return}
+ await w(1000);if(!S.auto)return;
+ next();await w(9000);
+}
+async function play(all){
+ if(S.auto)return;S.auto=true;
+ try{for(const k of(all?['luca','marta']:['marta'])){if(!S.auto)break;await journey(k)}
+  if(all&&S.auto){S.stage='end';render();await w(11000)}}
+ finally{S.auto=false;render(true)}
+}
+document.addEventListener('keydown',e=>{
+ if(e.key==='Enter'&&e.target.id==='chin'&&!S.auto){const v=e.target.value.trim();if(v){chatAnswer(v,true);render(true);const i=$('#chin');if(i)i.focus()}return}
+ if(/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;
+ if(e.key==='Escape')S.auto=false;
+ else if(e.key==='p'||e.key==='P')play(!e.shiftKey);
+});
+render();
+})();
+</script>
+
+</body></html>
